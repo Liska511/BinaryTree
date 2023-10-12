@@ -1,0 +1,415 @@
+#include <iostream>
+
+using namespace std;
+
+struct elem {
+    double data;
+    elem* left;
+    elem* right;
+    elem* previous;
+    bool flag;
+}*name = new elem;
+elem* node;
+int SizeTree = 0; // SizeTree - Счктчик элементов в дереве
+int Size, MaxNumber, Fillcounter = 0, ChoiceValue, value; // Size - Размер массива, Maxnumber - Максимальное число в массиве, value - Искомое значение в жереве 
+char Choice;
+
+void OrderedNumbers(int* BaseArray, int Size);     // Прототип функции заполнения изначального массива упорядоченными числами
+void ReverseNumbers(int* BaseArray, int Size);     // Прототип функции заполнения изначального массива обратными числами
+void RandomNumbers(int* BaseArray, int Size);      // Прототип функции заполнения изначального массива случайными числами
+void DegenerateNuumbers(int* BaseArray, int Size); // Прототип функции заполнения изначального массива вырожденными числами
+void PrintArray(int* BaseArray, int Size);               // Прототип функции вывода массива
+void BinaryTreeSort(int* BaseArray, int Size);  // Прототип функции создания бинарное дерева
+int addElem(int value); // Прототип функции добавления элемента в бинарное дерево
+elem* DeleteElem(elem* node, int value); // Прототип функции удаления узла дерева
+void printTree(int* BaseArray, elem* BinaryTree); // Прототип функции вывода бмнарного дерева
+void printLevelOrder(elem* node);  // Прототип функции обхода дерева в ширину
+void printCurrentLevel(elem* node, int level); // Прототип функции Вывода текущего уровня дерева 
+int height(elem* node); // Прототип функции вычисления высоты дерева
+void SearchElem(int* BaseArray, elem* BinaryTree, int value);  // Прототип функции поиска элемента
+
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    cout << "Сколько чисел будет содержаться в дереве?" << endl;
+    cin >> Size;
+    int* BaseArray;
+    BaseArray = new int[Size];
+    do
+    {
+        cout << "-------------------------------------------------------------------" << endl;
+        cout << "Какими числами заполняем массив?" << endl;
+        cout << "1.Упорядоченными.\n"
+            << "2.В обратном порядке.\n"
+            << "3.Случайными.\n"
+            << "4.Вырожденными.\n" << endl;
+        cin >> Choice;
+        ChoiceValue = int(Choice) - 48;
+        cout << endl;
+        switch (Choice)
+        {
+        case '1':
+            OrderedNumbers(BaseArray, Size);
+            break;
+
+        case '2':
+            ReverseNumbers(BaseArray, Size);
+            break;
+
+        case '3':
+            RandomNumbers(BaseArray, Size);
+            break;
+
+
+        case '4':
+            DegenerateNuumbers(BaseArray, Size);
+            break;
+
+
+
+        default:
+            cout << "Ошибка. Повторите ввод." << endl;
+            break;
+        }
+    } while (ChoiceValue > 4);
+    cout << "Заполняем дерево" << endl;
+    BinaryTreeSort(BaseArray, Size);
+    cout << "Выводим дерево через обход в глубину" << endl;
+    cout << endl;
+    printTree(BaseArray, node);
+    cout << "Элементы с каким значением будут удалены?"<<endl;
+    cin >> value;
+    DeleteElem(node, value);
+    cout << "Выводим дерево через обход в ширину" << endl;
+    printLevelOrder(node);
+    cout << "Какой элемент будем искать?" << endl;
+    cin >> value;
+    SearchElem(BaseArray, node, value);
+
+
+
+}
+
+
+
+
+
+void BinaryTreeSort(int* BaseArray, int Size) {   // Функция сортировки бинарным деревом
+
+    for (int i = 0; i < Size; i++) {
+        addElem(BaseArray[i]);
+    }
+}
+
+int addElem(int value) {   //  Функция добавления элемента в бинарное дерево
+    if (node == 0)
+    {
+        node = new elem;
+        node->data = value;
+        node->left = 0;
+        node->right = 0;
+        node->previous = 0; // у корня нет предшественника
+        node->flag = 0;
+        SizeTree++;
+    }
+    else {
+        elem* current = node;
+        while (current != 0)
+            if (value < current->data) {
+                if (current->left == 0)
+                {
+                    elem* tmp = new elem;
+                    tmp->data = value;
+                    tmp->left = 0;
+                    tmp->right = 0;
+                    tmp->flag = 0;
+                    tmp->previous = current;
+                    current->left = tmp;
+                    SizeTree++;
+                    break;
+
+                }
+                else
+                    current = current->left;
+            }
+            else {
+                if (current->right == 0)
+                {
+                    elem* tmp = new elem;
+                    tmp->data = value;
+                    tmp->left = 0;
+                    tmp->right = 0;
+                    tmp->flag = 0;
+                    tmp->previous = current;
+                    current->right = tmp;
+                    SizeTree++;
+                    break;
+                }
+                else
+                    current = current->right;
+            }
+    }
+
+    return 0;
+}
+
+elem* DeleteElem(elem* node, int value) {
+    if (node == NULL)
+        return node;
+
+    if (value == node->data) {
+
+        elem* tmp;
+        if (node->right == NULL)
+            tmp = node->left;
+        else {
+
+            elem* ptr = node->right;
+            if (ptr->left == NULL) {
+                ptr->left = node->left;
+                tmp = ptr;
+            }
+            else {
+
+                elem* pmin = ptr->left;
+                while (pmin->left != NULL) {
+                    ptr = pmin;
+                    pmin = ptr->left;
+                }
+                ptr->left = pmin->right;
+                pmin->left = node->left;
+                pmin->right = node->right;
+                tmp = pmin;
+            }
+        }
+
+        delete node;
+        SizeTree--;
+        return tmp;
+    }
+    else if (value < node->data)
+        node->left = DeleteElem(node->left, value);
+    else
+        node->right = DeleteElem(node->right, value);
+    return node;
+}
+
+
+void printTree(int* BaseArray, elem* BinaryTree) {   // Функция обхода бинарного дерева в глубину
+    elem* current = BinaryTree;
+    int i = 0;
+    if (current != 0)
+    {
+        while (i != SizeTree) {
+            if (current->left != 0 && current->left->flag == 0) {
+                current = current->left;
+                continue;
+            }
+            if (current->flag == 0)
+            {
+                cout << i + 1 << "." << current->data << ";  ";
+                i++;
+                current->flag = 1;
+                if (current->right != 0 && current->right->flag == 0) {
+                    current = current->right;
+                    continue;
+                }
+                if (current->previous != 0) {
+                    current = current->previous;
+                    continue;
+                }
+            }
+            if (current->right != 0 && current->right->flag == 0)
+            {
+                current = current->right;
+                continue;
+            }
+            if (current->flag == 1) {
+                if (current->previous != 0) {
+                    current = current->previous;
+                    continue;
+                }
+            }
+        }
+        i = 0;
+        current = BinaryTree;
+    }
+    else
+        cout << "Дерево пустое" << endl;
+
+}
+
+
+
+void SearchElem(int* BaseArray, elem* BinaryTree, int value) {   // Функция обхода бинарного дерева в глубину
+    elem* current = BinaryTree;
+    int i = 0;
+    int count = 0;
+    if (current != 0)
+    {
+        while (i != SizeTree) {
+            if (current->left != 0 && current->left->flag == 1) {
+                current = current->left;
+                continue;
+            }
+            if (current->flag == 1)
+            {
+                if (value == current->data) { 
+                    count++;
+                }
+                i++;
+                current->flag = 0;
+                if (current->right != 0 && current->right->flag == 1) {
+                    current = current->right;
+                    continue;
+                }
+                if (current->previous != 0) {
+                    current = current->previous;
+                    continue;
+                }
+            }
+            if (current->right != 0 && current->right->flag == 1)
+            {
+                current = current->right;
+                continue;
+            }
+            if (current->flag == 0) {
+                if (current->previous != 0) {
+                    current = current->previous;
+                    continue;
+                }
+            }
+        }
+        cout << "Всего найдено " << count << " подходящих элементов" << endl;
+    }
+
+
+    else
+        cout << "Дерево пустое" << endl;
+}
+
+
+void printLevelOrder(elem* node)   // Функция обхода бинарного  дерева в ширину
+{
+    int h = height(node);
+    int i;
+    for (i = 1; i <= h; i++)
+        printCurrentLevel(node, i);
+}
+
+
+void printCurrentLevel(elem* node, int level)  // Функция печати текущего уровня дерева
+{
+    if (node == NULL)
+        return;
+    if (level == 1)
+        cout << node->data << " ";
+    else if (level > 1) {
+        printCurrentLevel(node->left, level - 1);
+        printCurrentLevel(node->right, level - 1);
+    }
+}
+
+int height(elem* node)    // Функция вычисления высоты бинарного дерева
+{
+    if (node == NULL)
+        return 0;
+    else {
+
+        // Compute the height of each subtree
+        int lheight = height(node->left);
+        int rheight = height(node->right);
+
+        // Use the larger one
+        if (lheight > rheight) {
+            return (lheight + 1);
+        }
+        else {
+            return (rheight + 1);
+        }
+    }
+}
+
+
+
+
+void OrderedNumbers(int* BaseArray, int Size) // Функция заполнения массива упорядоченными числами
+{
+    cout << "Укажите максимальное число в массиве: ";
+    cin >> MaxNumber;
+    if (MaxNumber < Size) {
+        do {
+            cout << "Ошибка, введенное число меньше количества чисел в массиве. Заполнение невозможно." << endl;
+            cout << "Пожалуйста, введите число больше " << Size << " ." << endl;
+            cin >> MaxNumber;
+        } while (MaxNumber < Size);
+    }
+    srand(time(0));
+    BaseArray[0] = MaxNumber;
+    for (int i = 1; i < Size; i++)
+    {
+        BaseArray[i] = BaseArray[i - 1] - rand() % (MaxNumber / Size) - 1;
+    }
+    cout << "Массив заполнен упорядоченными числами." << endl;
+}
+
+void ReverseNumbers(int* BaseArray, int Size) // Функция заполнения массиве числами в обратном порядке
+{
+    cout << "Укажите максимальное число в массиве: ";
+    cin >> MaxNumber;
+    if (MaxNumber < Size) {
+        do {
+            cout << "Ошибка, введенное число меньше количества чисел в массиве. Заполнение невозможно." << endl;
+            cout << "Пожалуйста, введите число больше " << Size << " ." << endl;
+            cin >> MaxNumber;
+        } while (MaxNumber < Size);
+    }
+
+    srand(time(0));
+    BaseArray[0] = 1;
+    for (int i = 1; i < Size; i++)
+    {
+        BaseArray[i] = BaseArray[i - 1] + rand() % (MaxNumber / Size) - 1;
+    }
+    cout << "Массив заполнен числами в обратном порядке." << endl;
+}
+
+void RandomNumbers(int* BaseArray, int Size) // Функция заполнения изначального массива случайными числами
+{
+    cout << "Укажите максимальное числол в массиве: ";
+    cin >> MaxNumber;
+    srand(time(0));
+    for (int i = 0; i < Size; i++)
+    {
+        BaseArray[i] = rand() % MaxNumber + 1;
+    }
+
+
+    cout << "Массив заполнен случайными числами." << endl;
+}
+void DegenerateNuumbers(int* BaseArray, int Size) // Функция заполнения изначального массиве вырожденными числами
+{
+    srand(time(0));
+    for (int i = 0; i < Size; i++)
+    {
+        BaseArray[i] = rand() % 12 + 1;
+    }
+    cout << "Массив заполнен вырожденными числами." << endl;
+}
+
+void PrintArray(int* Arr, int Size) { // Функция вывода массива на экран
+    for (int i = 1; i <= Size; i++)
+    {
+        cout << i << "." << Arr[i - 1] << " ";
+        if (i % 10 == 0)
+        {
+            cout << "\n";
+        }
+    }
+    cout << endl;
+}
+
+
+
+
