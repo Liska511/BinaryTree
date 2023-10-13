@@ -218,11 +218,17 @@ elem* DeleteElem(elem* node, int value) {
 void printTree(int* BaseArray, elem* BinaryTree) {   // Функция обхода бинарного дерева в глубину
     elem* current = BinaryTree;
     int i = 0;
+    cout<<i+1<<")"<<current->data<<"; ";
+    current->flag=1;
+    i++;
     if (current != 0)
     {
         while (i != SizeTree) {
             if (current->left != 0 && current->left->flag == 0) {
                 current = current->left;
+                cout << i + 1 << ")" << current->data << ";  ";
+                current->flag=1;
+                i++;
                 continue;
             }
             if (current->flag == 0)
@@ -232,6 +238,9 @@ void printTree(int* BaseArray, elem* BinaryTree) {   // Функция обхо�
                 current->flag = 1;
                 if (current->right != 0 && current->right->flag == 0) {
                     current = current->right;
+                    cout << i + 1 << ")" << current->data << ";  ";
+                    current->flag=1;
+                    i++;
                     continue;
                 }
                 if (current->previous != 0) {
@@ -242,9 +251,12 @@ void printTree(int* BaseArray, elem* BinaryTree) {   // Функция обхо�
             if (current->right != 0 && current->right->flag == 0)
             {
                 current = current->right;
+                 cout << i + 1 << ")" << current->data << ";  ";
+                 current->flag=1;
+                 i++;
                 continue;
             }
-            if (current->flag == 1) {
+            if (current->flag == 1 and i>0) {
                 if (current->previous != 0) {
                     current = current->previous;
                     continue;
@@ -428,7 +440,3 @@ void PrintArray(int* Arr, int Size) { // Функция вывода масси�
     }
     cout << endl;
 }
-
-
-
-
