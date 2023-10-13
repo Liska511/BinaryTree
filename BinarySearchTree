@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -14,6 +15,7 @@ int SizeTree = 0; // SizeTree - Счктчик элементов в дерев�
 int Size, MaxNumber, Fillcounter = 0, ChoiceValue, value; // Size - Размер массива, Maxnumber - Максимальное число в массиве, value - Искомое значение в жереве 
 char Choice;
 
+void OutTree(elem* node, string str);  // Прототтип функции визуализации бинарного дерева
 void OrderedNumbers(int* BaseArray, int Size);     // Прототип функции заполнения изначального массива упорядоченными числами
 void ReverseNumbers(int* BaseArray, int Size);     // Прототип функции заполнения изначального массива обратными числами
 void RandomNumbers(int* BaseArray, int Size);      // Прототип функции заполнения изначального массива случайными числами
@@ -75,10 +77,18 @@ int main()
     } while (ChoiceValue > 4);
     cout << "Заполняем дерево" << endl;
     BinaryTreeSort(BaseArray, Size);
+    cout << "Выводим структуру бинарного  дерева" << endl;
+    cout << "\n\n";
+    string str = "";
+    OutTree(node, str);
+    cout << "\n\n";
+
+
     cout << "Выводим дерево через обход в глубину" << endl;
     cout << endl;
     printTree(BaseArray, node);
-    cout << "Элементы с каким значением будут удалены?"<<endl;
+    cout << endl;
+    cout << "Элементы с каким значением будут удалены?" << endl;
     cin >> value;
     DeleteElem(node, value);
     cout << "Выводим дерево через обход в ширину" << endl;
@@ -93,6 +103,15 @@ int main()
 
 
 
+
+
+void OutTree(elem* node, string str) {  // Функция вывода структуры бинарного
+    if (!node) { return; }
+    str += "\t";
+    OutTree(node->left, str);
+    cout << str << node->data << endl;
+    OutTree(node->right, str);
+}
 
 
 void BinaryTreeSort(int* BaseArray, int Size) {   // Функция сортировки бинарным деревом
@@ -208,7 +227,7 @@ void printTree(int* BaseArray, elem* BinaryTree) {   // Функция обхо�
             }
             if (current->flag == 0)
             {
-                cout << i + 1 << "." << current->data << ";  ";
+                cout << i + 1 << ")" << current->data << ";  ";
                 i++;
                 current->flag = 1;
                 if (current->right != 0 && current->right->flag == 0) {
@@ -255,7 +274,7 @@ void SearchElem(int* BaseArray, elem* BinaryTree, int value) {   // Функци
             }
             if (current->flag == 1)
             {
-                if (value == current->data) { 
+                if (value == current->data) {
                     count++;
                 }
                 i++;
